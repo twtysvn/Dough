@@ -1,44 +1,50 @@
 package com.example.android.dough;
 
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
+import android.widget.SimpleCursorAdapter;
 
 public class MainActivity extends AppCompatActivity {
+
+    private RecordsDBAdapter dbHelper;
+    private SimpleCursorAdapter dataAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Calendar c = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-        String dateTime = sdf.format(c.getTime());
+        dbHelper = new RecordsDBAdapter(this);
+        dbHelper.open();
 
-        int i = 1;
+        dbHelper.deleteAllRecords();
+        dbHelper.insertSomeRecords();
 
-        DataBaseHelper myDB = new DataBaseHelper(this);
+        displayListView();
+    }
 
-        while(i < 11) {
-            Boolean recNo = myDB.newRecord(dateTime, 212.12, "Plata " + i);
-            i = i + 1;
-        }
+    private void displayListView() {
 
-        ArrayList array_list = myDB.getAllRecords();
-        ArrayAdapter arrayAdapter = new ArrayAdapter(
-                this,
-                R.layout.list_last_activity,
-                R.id.text_plus_primary,
-                array_list);
+        Cursor cursor = dbHelper.readAllRecords();
 
-        // Find reference to ListView and attach the adapter
-        ListView listView = (ListView) findViewById(
-                R.id.listview_last_activity);
-        listView.setAdapter(arrayAdapter);
+        String[] columnsFrom = new String[] {
+                RecordsDBAdapter.COLUMN_DATE,
+                RecordsDBAdapter.COLUMN_AMOUNT,
+                RecordsDBAdapter.COLUMN_TYPE
+        };
+
+        int[] viewsTo = new int[] {
+                R.id.text_plus_secondary,
+                R.id.text_plus_amount,
+                R.id.text_plus_primary
+        };
+
+        dataAdapter = new SimpleCursorAdapter(
+                this, R.layout.list_last_activity,cursor, columnsFrom, viewsTo, 0);
+
+        ListView listView = (ListView) findViewById(R.id.listview_last_activity);
+        listView.setAdapter(dataAdapter);
     }
 }
