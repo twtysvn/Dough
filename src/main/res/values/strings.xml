@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Dough</string>
+    <string name="account_name">Firstname Middlename LASTNAME</string>
+    <string name="currency">RON</string>
+    <string name="amount">0.00</string>
+    <string name="last_update">Last update: 21/12/2012</string>
+
+</resources>
